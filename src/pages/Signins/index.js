@@ -1,7 +1,8 @@
 import React from 'react';
 import { makeStyles, CssBaseline, createMuiTheme, ThemeProvider } from '@material-ui/core';
-import Employees from './Employees';
+import Header from '../../components/Header';
 import Layout from '../../components/Layout';
+import SignIn from './Signin';
 
 const theme = createMuiTheme({
     palette: {
@@ -44,14 +45,12 @@ export default function Production() {
 
     return (
         <Layout>
-            <ThemeProvider theme={theme}>
-                <div className={classes.appMain}>
-                    <Employees />
-                </div>
-                <CssBaseline />
-            </ThemeProvider>
+        <ThemeProvider theme={theme}>
+            <div className={classes.appMain}>
+                <SignIn />
+            </div>
+            <CssBaseline />
+        </ThemeProvider>
         </Layout>
     );
 }
-
-

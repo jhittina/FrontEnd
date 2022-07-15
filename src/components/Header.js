@@ -3,10 +3,7 @@ import { AppBar, Toolbar, Grid, InputBase, IconButton, Badge, makeStyles } from 
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
-import SearchIcon from '@material-ui/icons/Search';
 import SideMenu from '../components/SideMenu'
-
-
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -37,11 +34,6 @@ export default function Header() {
                     alignItems="center">
                     <Grid item>
                         <SideMenu />
-                        {/* <InputBase
-                            placeholder="Search topics"
-                            className={classes.searchInput}
-                            startAdornment={<SearchIcon fontSize="small" />}
-                        /> */}
                     </Grid>
                     <Grid item sm></Grid>
                     <Grid item>
