@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import EmployeeForm from "./EmployeeForm";
 import PageHeader from "../../components/PageHeader";
 import PeopleOutlineTwoToneIcon from '@material-ui/icons/PeopleOutlineTwoTone';
@@ -11,6 +11,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Popup from "../../components/Popup";
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import CloseIcon from '@material-ui/icons/Close';
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
     pageContent: {
@@ -36,7 +37,6 @@ const headCells = [
 ]
 
 export default function Employees() {
-
     const classes = useStyles();
     const [recordForEdit, setRecordForEdit] = useState(null)
     const [records, setRecords] = useState(employeeService.getAllEmployees())
@@ -49,6 +49,14 @@ export default function Employees() {
         TblPagination,
         recordsAfterPagingAndSorting
     } = useTable(records, headCells, filterFn);
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        const isLoggedIn = localStorage.getItem('token')
+        if (!isLoggedIn) {
+            navigate("/")
+        }//Runs only on the first render
+    }, []);
 
     const handleSearch = e => {
         let target = e.target;
@@ -111,23 +119,23 @@ export default function Employees() {
                     <TableBody>
                         {
                             recordsAfterPagingAndSorting().map(item =>
-                                (<TableRow key={item.id}>
-                                    <TableCell>{item.fullName}</TableCell>
-                                    <TableCell>{item.email}</TableCell>
-                                    <TableCell>{item.mobile}</TableCell>
-                                    <TableCell>{item.department}</TableCell>
-                                    <TableCell>
-                                        <Controls.ActionButton
-                                            color="primary"
-                                            onClick={() => { openInPopup(item) }}>
-                                            <EditOutlinedIcon fontSize="small" />
-                                        </Controls.ActionButton>
-                                        <Controls.ActionButton
-                                            color="secondary">
-                                            <CloseIcon fontSize="small" />
-                                        </Controls.ActionButton>
-                                    </TableCell>
-                                </TableRow>)
+                            (<TableRow key={item.id}>
+                                <TableCell>{item.fullName}</TableCell>
+                                <TableCell>{item.email}</TableCell>
+                                <TableCell>{item.mobile}</TableCell>
+                                <TableCell>{item.department}</TableCell>
+                                <TableCell>
+                                    <Controls.ActionButton
+                                        color="primary"
+                                        onClick={() => { openInPopup(item) }}>
+                                        <EditOutlinedIcon fontSize="small" />
+                                    </Controls.ActionButton>
+                                    <Controls.ActionButton
+                                        color="primary">
+                                        <CloseIcon fontSize="small" />
+                                    </Controls.ActionButton>
+                                </TableCell>
+                            </TableRow>)
                             )
                         }
                     </TableBody>

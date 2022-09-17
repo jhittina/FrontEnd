@@ -1,7 +1,9 @@
 import React from 'react';
 import { makeStyles, CssBaseline, createMuiTheme, ThemeProvider } from '@material-ui/core';
-import Employees from './Employees';
+import Production from './Production';
 import Layout from '../../components/Layout';
+import Employees from '../Employees/Employees';
+
 
 const theme = createMuiTheme({
     palette: {
@@ -39,14 +41,14 @@ const useStyles = makeStyles({
     }
 })
 
-export default function Employee() {
+export default function Productions() {
     const classes = useStyles();
 
     return (
         <Layout>
             <ThemeProvider theme={theme}>
                 <div className={classes.appMain}>
-                    <Employees />
+                    <Production />
                 </div>
                 <CssBaseline />
             </ThemeProvider>

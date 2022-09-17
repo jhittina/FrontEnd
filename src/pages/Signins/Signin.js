@@ -12,7 +12,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import SimpleBackdrop from '../../components/SimpleBackdrop';
+import { useNavigate } from "react-router-dom";
+import { Signin } from '../../services/SigninSlice';
+import { useDispatch, useSelector } from "react-redux";
+const env = require('dotenv');
+env.config();
 
 function Copyright(props) {
     return (
@@ -27,21 +33,44 @@ function Copyright(props) {
     );
 }
 
+
 const theme = createTheme();
 
 export default function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+   const { loading, data, body, edit,error } = useSelector((state) => ({
+     ...state.app,
+   }));
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const isLoggedIn = localStorage.getItem('token')
+        if (isLoggedIn) {
+            navigate("/production")
+        }
+        //Runs only on the first render
+    }, []);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(email, password);
+        const body = { "email": email, "password": password }
+        dispatch(Signin({body}))
         // clearing the values
         setEmail("");
         setPassword("");
     };
-
+    console.log(data[0]?.token,"@@@@@@@@@@@");
+    if (data[0]?.token) {
+        localStorage.setItem('token', data[0]?.token);
+        localStorage.setItem('userData', data[0]?.user);
+        navigate('/production');
+    }
+ 
     return (
         <ThemeProvider theme={theme}>
+            {loading && <SimpleBackdrop />}
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <Box

@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { Table, TableHead, TableRow, TableCell, makeStyles, TablePagination, TableSortLabel } from '@material-ui/core'
+import { useDispatch, useSelector } from "react-redux";
+import { getProductions } from '../services/ProductionSlice';
 
 const useStyles = makeStyles(theme => ({
     table: {
@@ -19,16 +21,15 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-export default function useTable(records, headCells,filterFn) {
+export default function useTable(records, headCells, filterFn) {
 
     const classes = useStyles();
-
     const pages = [5, 10, 25]
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(pages[page])
     const [order, setOrder] = useState()
     const [orderBy, setOrderBy] = useState()
-
+    const dispatch = useDispatch();
     const TblContainer = props => (
         <Table className={classes.table}>
             {props.children}
@@ -72,15 +73,16 @@ export default function useTable(records, headCells,filterFn) {
         setPage(0);
     }
 
-    const TblPagination = () => (<TablePagination
-        component="div"
-        page={page}
-        rowsPerPageOptions={pages}
-        rowsPerPage={rowsPerPage}
-        count={records.length}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-    />)
+    const TblPagination = (props) => (
+        <TablePagination
+            component="div"
+            page={page}
+            rowsPerPageOptions={pages}
+            rowsPerPage={rowsPerPage}
+            count={records.length}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+        />)
 
     function stableSort(array, comparator) {
         const stabilizedThis = array.map((el, index) => [el, index]);
