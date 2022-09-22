@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const getProductions = createAsyncThunk("getProductions", async ({ arg }) => {
-  const {token} = arg
+  const {token,params} = arg
   var url = `${process.env.REACT_APP_BACKEND_URL}/productions`
   const options = {
     method: "GET",
@@ -10,7 +10,7 @@ export const getProductions = createAsyncThunk("getProductions", async ({ arg })
       'token': token
     }
   }
-  return fetch(url, options).then((res) => res.json());
+  return fetch(url+'?'+ new URLSearchParams(params), options).then((res) => res.json());
 }
 );
 

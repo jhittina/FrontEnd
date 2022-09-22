@@ -41,7 +41,8 @@ export default function PageHeader(props) {
                     <Typography
                         variant="subtitle2"
                         component="div">
-                        {subTitle}</Typography>
+                        {subTitle}
+                    </Typography>
                 </div>
             </div>
         </Paper>

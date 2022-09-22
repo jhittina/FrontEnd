@@ -44,13 +44,11 @@ export default function ProductionForm(props) {
             values.quantity = parseInt(values.quantity)
             values.date = moment(values.date).format('YYYY/MM/DD');
             addOrEdit(values, resetForm);
-
-            console.log(values.date);
         }
     }
     const getProductionBrickTypeCollection = () => ([
-        { id: '1', title: '4 Inch Brick' },
-        { id: '2', title: '6 Inch Brick' },
+        { id: '4 Inch Brick', title: '4 Inch Brick' },
+        { id: '6 Inch Brick', title: '6 Inch Brick' },
     ])
 
 

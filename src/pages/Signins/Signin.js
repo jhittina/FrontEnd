@@ -40,7 +40,7 @@ export default function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
    const { loading, data, body, edit,error } = useSelector((state) => ({
-     ...state.app,
+     ...state.sign,
    }));
     const dispatch = useDispatch();
     const navigate = useNavigate();

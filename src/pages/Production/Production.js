@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 import EmployeeForm from "./ProductionForm";
 import PageHeader from "../../components/PageHeader";
 import PeopleOutlineTwoToneIcon from '@material-ui/icons/PeopleOutlineTwoTone';
-import { Paper, makeStyles, TableBody, TableRow, TableCell, Toolbar, InputAdornment } from '@material-ui/core';
+import { Paper, makeStyles, TableBody, TableRow, TableCell, Toolbar, InputAdornment, TablePagination } from '@material-ui/core';
 import useTable from "../../components/useTable";
-import * as employeeService from "../../services/employeeService";
 import Controls from "../../components/controls/Controls";
 import { Search } from "@material-ui/icons";
 import AddIcon from '@material-ui/icons/Add';
@@ -12,14 +11,14 @@ import Popup from "../../components/Popup";
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import CloseIcon from '@material-ui/icons/Close';
 import { useNavigate } from "react-router-dom";
-// import { useProductionPostMutation, useProductionUpdatePostMutation, useGetAllProductionsQuery } from '../../services/productionService';
 import SimpleBackdrop from '../../components/SimpleBackdrop';
 import { useDispatch, useSelector } from "react-redux";
 import { getProductions, createProduction, deleteProduction } from '../../services/ProductionSlice';
+import swal from 'sweetalert';
 
 const useStyles = makeStyles(theme => ({
     pageContent: {
-        margin: theme.spacing(2),
+        margin: theme.spacing(1),
         padding: theme.spacing(1)
     },
     searchInput: {
@@ -28,7 +27,19 @@ const useStyles = makeStyles(theme => ({
     newButton: {
         position: 'absolute',
         right: '10px'
-    }
+    },
+    scroll: {
+        "&::-webkit-scrollbar": {
+            width: 7,
+        },
+        "&::-webkit-scrollbar-track": {
+            boxShadow: `inset 0 0 6px rgba(0, 0, 0, 0.3)`,
+        },
+        "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "darkgrey",
+            outline: `1px solid slategrey`,
+        },
+    },
 }))
 
 
@@ -50,17 +61,25 @@ export default function Production() {
     const { loading, data, body, edit, error } = useSelector((state) => ({
         ...state.app,
     }));
+    const pages = [6]
+    const [page, setPage] = useState(0)
+    const [rowsPerPage, setRowsPerPage] = useState(pages[page])
     const navigate = useNavigate();
     useEffect(() => {
-        var arg = {}
-        arg.token = token
-        dispatch(getProductions({ arg }));
         if (!token) {
             navigate("/")
         }
+        var arg = {}
+        arg.token = token
+        arg.params = {
+            page: page,
+            limit: 6
+        }
+        dispatch(getProductions({ arg }));
         // Runs only on the first render
         setRecords(data)
-    }, [records]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [records, navigate, 0]);
 
     const handleSearch = e => {
         let target = e.target;
@@ -76,6 +95,17 @@ export default function Production() {
     function refreshPage() {
         window.location.reload(false);
     }
+    const handleChangePage = (event, newPage) => {
+        console.log(newPage);
+        setPage(newPage)
+        var arg = {}
+        arg.token = token
+        arg.params = {
+            page: newPage,
+            limit: 6
+        }
+        dispatch(getProductions({ arg }));
+    }
 
     const addOrEdit = async (employee, resetForm) => {
         var arg = {}
@@ -85,6 +115,11 @@ export default function Production() {
             dispatch(createProduction({ arg }));
             dispatch(getProductions({ token }));
             setRecords(data)
+            swal("Created!", "Good Job!", "success", {
+                icon: "success",
+                buttons: false,
+                timer: 1000,
+            });
         }
         else {
             arg.body = employee
@@ -92,6 +127,11 @@ export default function Production() {
             dispatch(createProduction({ arg }));
             dispatch(getProductions({ token }));
             setRecords(data)
+            swal("Updated!", "Good Job!", "success", {
+                icon: "success",
+                buttons: false,
+                timer: 1000,
+            });
         }
         resetForm()
         setRecordForEdit(null)
@@ -99,12 +139,34 @@ export default function Production() {
     }
 
     const deleteRecords = async (id) => {
-        var arg = {}
-        arg.id = id
-        arg.token = token
-        dispatch(deleteProduction({ arg }));
-        dispatch(getProductions({ token }));
-        setRecords(data)
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this requested data!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    var arg = {}
+                    arg.id = id
+                    arg.token = token
+                    dispatch(deleteProduction({ arg }));
+                    dispatch(getProductions({ token }));
+                    setRecords(data)
+                    swal("Poof! Your requested data has been deleted!", {
+                        icon: "success",
+                        buttons: false,
+                        timer: 1000,
+                    });
+                } else {
+                    swal("Your requested data is safe!", {
+                        icon: "error",
+                        buttons: false,
+                        timer: 1000,
+                    });
+                }
+            });
     }
     const openInPopup = item => {
         setRecordForEdit(item)
@@ -113,7 +175,6 @@ export default function Production() {
     const {
         TblContainer,
         TblHead,
-        TblPagination,
         recordsAfterPagingAndSorting
     } = useTable(data.length === 0 ? [] : data[0]?.data, headCells, filterFn);
 
@@ -147,14 +208,14 @@ export default function Production() {
                     />
                 </Toolbar>
                 {loading && <SimpleBackdrop />}
-                {loading == false ? <>
-                    <TblContainer>
+                {loading === false ? <>
+                    <TblContainer className={classes.scroll}>
                         <TblHead />
                         <TableBody>
                             {
                                 recordsAfterPagingAndSorting().map(item =>
                                 (<TableRow key={item._id}>
-                                    <TableCell>{item.date}</TableCell>
+                                    <TableCell>{new Date(item.date).toISOString().slice(0, 10)}</TableCell>
                                     <TableCell>{item.type}</TableCell>
                                     <TableCell>{item.quantity}</TableCell>
                                     <TableCell>
@@ -174,7 +235,14 @@ export default function Production() {
                             }
                         </TableBody>
                     </TblContainer>
-                    <TblPagination />
+                    <TablePagination
+                        component="div"
+                        page={page}
+                        rowsPerPageOptions={pages}
+                        rowsPerPage={rowsPerPage}
+                        count={data[0]?.totalCount}
+                        onChangePage={handleChangePage}
+                    />
                 </> : error}
             </Paper>
             <Popup

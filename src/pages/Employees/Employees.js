@@ -115,7 +115,7 @@ export default function Employees() {
                     />
                 </Toolbar>
                 <TblContainer>
-                    <TblHead />
+                    <TblHead/>
                     <TableBody>
                         {
                             recordsAfterPagingAndSorting().map(item =>

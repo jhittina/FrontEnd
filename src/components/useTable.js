@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import { Table, TableHead, TableRow, TableCell, makeStyles, TablePagination, TableSortLabel } from '@material-ui/core'
-import { useDispatch, useSelector } from "react-redux";
-import { getProductions } from '../services/ProductionSlice';
 
 const useStyles = makeStyles(theme => ({
     table: {
@@ -12,7 +10,7 @@ const useStyles = makeStyles(theme => ({
             backgroundColor: theme.palette.primary.light,
         },
         '& tbody td': {
-            fontWeight: '300',
+            fontWeight: '400',
         },
         '& tbody tr:hover': {
             backgroundColor: '#fffbf2',
@@ -24,12 +22,11 @@ const useStyles = makeStyles(theme => ({
 export default function useTable(records, headCells, filterFn) {
 
     const classes = useStyles();
-    const pages = [5, 10, 25]
+    const pages = [6]
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(pages[page])
     const [order, setOrder] = useState()
     const [orderBy, setOrderBy] = useState()
-    const dispatch = useDispatch();
     const TblContainer = props => (
         <Table className={classes.table}>
             {props.children}

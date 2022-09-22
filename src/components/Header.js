@@ -4,11 +4,12 @@ import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
 import SideMenu from '../components/SideMenu'
+import Filter from './Filter';
 
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: '#fff',
-        
+
     },
     searchInput: {
         opacity: '0.6',
@@ -48,7 +49,9 @@ export default function Header() {
                             </Badge>
                         </IconButton>
                         <IconButton>
-                            <PowerSettingsNewIcon fontSize="small" />
+                            <Grid item>
+                                <Filter />
+                            </Grid>
                         </IconButton>
                     </Grid>
                 </Grid>
