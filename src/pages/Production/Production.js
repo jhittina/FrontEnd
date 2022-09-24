@@ -15,6 +15,7 @@ import SimpleBackdrop from '../../components/SimpleBackdrop';
 import { useDispatch, useSelector } from "react-redux";
 import { getProductions, createProduction, deleteProduction } from '../../services/ProductionSlice';
 import swal from 'sweetalert';
+import StripedGrid from '../../components/StripedGrid';
 
 const useStyles = makeStyles(theme => ({
     pageContent: {
@@ -209,32 +210,7 @@ export default function Production() {
                 </Toolbar>
                 {loading && <SimpleBackdrop />}
                 {loading === false ? <>
-                    <TblContainer className={classes.scroll}>
-                        <TblHead />
-                        <TableBody>
-                            {
-                                recordsAfterPagingAndSorting().map(item =>
-                                (<TableRow key={item._id}>
-                                    <TableCell>{new Date(item.date).toISOString().slice(0, 10)}</TableCell>
-                                    <TableCell>{item.type}</TableCell>
-                                    <TableCell>{item.quantity}</TableCell>
-                                    <TableCell>
-                                        <Controls.ActionButton
-                                            color="primary"
-                                            onClick={() => { openInPopup(item) }}>
-                                            <EditOutlinedIcon fontSize="small" />
-                                        </Controls.ActionButton>
-                                        <Controls.ActionButton
-                                            color="secondary"
-                                            onClick={() => { deleteRecords(item._id) }}>
-                                            <CloseIcon fontSize="small" />
-                                        </Controls.ActionButton>
-                                    </TableCell>
-                                </TableRow>)
-                                )
-                            }
-                        </TableBody>
-                    </TblContainer>
+                    <StripedGrid row={data[0]} loading={loading}/>
                     <TablePagination
                         component="div"
                         page={page}
