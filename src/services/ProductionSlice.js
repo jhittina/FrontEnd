@@ -1,54 +1,59 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-export const getProductions = createAsyncThunk("getProductions", async ({ arg }) => {
-  const {token,params} = arg
-  var url = `${process.env.REACT_APP_BACKEND_URL}/productions`
-  const options = {
-    method: "GET",
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-      'token': token
-    }
+export const getProductions = createAsyncThunk(
+  "getProductions",
+  async ({ arg }) => {
+    const { token, params } = arg;
+    console.log(arg, "@@@@@@@@@@");
+    var url = `${process.env.REACT_APP_BACKEND_URL}/productions`;
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+        token: token,
+      },
+    };
+    return fetch(url + "?" + new URLSearchParams(params), options).then((res) =>
+      res.json()
+    );
   }
-  return fetch(url+'?'+ new URLSearchParams(params), options).then((res) => res.json());
-}
 );
 
 export const deleteProduction = createAsyncThunk(
   "deleteProduction",
   async ({ arg }) => {
-    const {token,id} = arg
-    var url = `${process.env.REACT_APP_BACKEND_URL}/production/?id=${id}`
-    const options ={
+    const { token, id } = arg;
+    var url = `${process.env.REACT_APP_BACKEND_URL}/production/?id=${id}`;
+    const options = {
       method: "DELETE",
       headers: {
         Accept: "application/json",
         "Content-type": "application/json",
-        'token': token
+        token: token,
       },
-    }
+    };
     return fetch(url, options).then((res) => res.json());
   }
 );
 export const createProduction = createAsyncThunk(
   "createProduction",
   async ({ arg }) => {
-    const {body,token} = arg
-    var url
+    const { body, token } = arg;
+    var url;
     if (body.hasOwnProperty("_id")) {
-      url = `${process.env.REACT_APP_BACKEND_URL}/production/?id=${body?._id}`
+      url = `${process.env.REACT_APP_BACKEND_URL}/production/?id=${body?._id}`;
     } else {
-      url = `${process.env.REACT_APP_BACKEND_URL}/production`
+      url = `${process.env.REACT_APP_BACKEND_URL}/production`;
     }
     const options = {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-type": "application/json",
-        'token': token
+        token: token,
       },
       body: JSON.stringify(body),
-    }
+    };
     return fetch(url, options).then((res) => res.json());
   }
 );
