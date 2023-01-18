@@ -101,8 +101,8 @@ export default function Filter(props) {
   };
 
   const genderItems = [
-    { id: "4 Inch Brick", title: "4 Inch Brick" },
-    { id: "6 Inch Brick", title: "6 Inch Brick" },
+    { id: "FourInch", title: "FourInch" },
+    { id: "SixInch", title: "SixInch" },
   ];
 
   const list = (anchor) => (

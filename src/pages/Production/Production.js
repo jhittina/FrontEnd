@@ -2,26 +2,13 @@ import React, { useState, useEffect } from "react";
 import EmployeeForm from "./ProductionForm";
 import PageHeader from "../../components/PageHeader";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
-import {
-  Paper,
-  makeStyles,
-  TableBody,
-  TableRow,
-  TableCell,
-  Toolbar,
-  InputAdornment,
-  TablePagination,
-} from "@material-ui/core";
-import useTable from "../../components/useTable";
+import { Paper, makeStyles, Toolbar, TablePagination } from "@material-ui/core";
 import Controls from "../../components/controls/Controls";
-import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Popup from "../../components/Popup";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import CloseIcon from "@material-ui/icons/Close";
 import { useNavigate } from "react-router-dom";
 import SimpleBackdrop from "../../components/SimpleBackdrop";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +16,7 @@ import {
   getProductions,
   createProduction,
   deleteProduction,
+  clearErrorState,
 } from "../../services/ProductionSlice";
 import swal from "sweetalert";
 import StripedGrid from "../../components/StripedGrid";
@@ -72,105 +60,96 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const headCells = [
-  { id: "date", label: "Date" },
-  { id: "brickType", label: "Brick Type" },
-  { id: "quantity", label: "Quantity" },
-  { id: "actions", label: "Actions", disableSorting: true },
-];
-
 export default function Production() {
   const classes = useStyles();
   const [recordForEdit, setRecordForEdit] = useState(null);
-  const [filterFn, setFilterFn] = useState({
-    fn: (items) => {
-      return items;
-    },
-  });
   const [openPopup, setOpenPopup] = useState(false);
   const token = localStorage.getItem("token");
-  const [records, setRecords] = useState([]);
   const dispatch = useDispatch();
-  const { loading, data, body, edit, error } = useSelector((state) => ({
+  var {
+    loading,
+    data,
+    error,
+    createdData,
+    deletedData,
+    createError,
+    deleteError,
+    updateError,
+  } = useSelector((state) => ({
     ...state.app,
   }));
-  const pages = [6];
+  const pages = [10];
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+  const [rowsPerPage] = useState(pages[page]);
   const [id, setId] = useState(null);
+
+  const [arg, setArg] = useState({
+    token: token,
+    params: {
+      page: 0,
+      limit: 10,
+    },
+  });
   const navigate = useNavigate();
   useEffect(() => {
     if (!token) {
       navigate("/");
+    } else {
+      dispatch(getProductions({ arg }));
     }
-    var arg = {};
-    arg.token = token;
-    arg.params = {
-      page: page,
-      limit: 6,
-    };
-    dispatch(getProductions({ arg }));
-    // Runs only on the first render
-    setRecords(data);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [records, navigate, 0]);
+  }, [navigate, createdData, page, deletedData, arg, token, dispatch]);
 
-  const handleSearch = (e) => {
-    let target = e.target;
-    setFilterFn({
-      fn: (items) => {
-        if (target.value == "") return items;
-        else
-          return items.filter((x) =>
-            x.fullName.toLowerCase().includes(target.value)
-          );
-      },
-    });
-  };
   function refreshPage() {
     window.location.reload(false);
   }
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    var arg = {};
-    arg.token = token;
-    arg.params = {
-      page: newPage,
-      limit: 6,
-    };
-    dispatch(getProductions({ arg }));
+    let queryArg = arg;
+    queryArg.params.page = newPage;
+    setArg({
+      ...queryArg,
+    });
   };
-
   const handleClick = (id) => {
     // 👇️ take parameter passed from Child component
     setId(id);
   };
 
+  if (createError) {
+    swal(`${createError}`, {
+      icon: "error",
+      buttons: true,
+    });
+    dispatch(clearErrorState({ arg }));
+  }
+  if (deleteError) {
+    swal(`${deleteError}`, {
+      icon: "error",
+      buttons: true,
+    });
+    dispatch(clearErrorState({ arg }));
+  }
+  if (updateError) {
+    swal(`${updateError}`, {
+      icon: "error",
+      buttons: true,
+    });
+    dispatch(clearErrorState({ arg }));
+  }
+
   const addOrEdit = async (employee, resetForm) => {
     var arg = {};
     if (!employee._id) {
+      // updating the data
       arg.body = employee;
       arg.token = token;
       dispatch(createProduction({ arg }));
-      dispatch(getProductions({ token }));
-      setRecords(data);
-      swal("Created!", "Good Job!", "success", {
-        icon: "success",
-        buttons: false,
-        timer: 1000,
-      });
     } else {
+      // creating the new data
       arg.body = employee;
       arg.token = token;
       dispatch(createProduction({ arg }));
-      dispatch(getProductions({ token }));
-      setRecords(data);
       setId(null);
-      swal("Updated!", "Good Job!", "success", {
-        icon: "success",
-        buttons: false,
-        timer: 1000,
-      });
     }
     resetForm();
     setRecordForEdit(null);
@@ -192,7 +171,6 @@ export default function Production() {
         dispatch(deleteProduction({ arg }));
         setId(null);
         dispatch(getProductions({ token }));
-        setRecords(data);
         swal("Poof! Your requested data has been deleted!", {
           icon: "success",
           buttons: false,
@@ -207,22 +185,27 @@ export default function Production() {
       }
     });
   };
+
   const filterQuery = (query) => {
+    let queryParams = {};
     const { queryDate, queryBrickType } = query;
-    const params = {
-      startDate: queryDate?.queryStartDate,
-      endDate: queryDate?.queryendDate,
-      type: queryBrickType,
+    if (queryBrickType) {
+      queryParams.type = queryBrickType;
+    }
+    if (queryDate) {
+      queryParams.startDate = queryDate?.queryStartDate;
+      queryParams.endDate = queryDate?.queryendDate;
+    }
+    let queryArg = arg;
+    queryArg.params = {
+      ...queryParams,
     };
-    dispatch(getProductions({ token, params }));
-    setRecords(data);
+    setArg({ ...queryArg });
   };
   const openInPopup = (item) => {
-    console.log(item);
     setRecordForEdit(item);
     setOpenPopup(true);
   };
-
   return (
     <>
       <PageHeader
@@ -261,7 +244,6 @@ export default function Production() {
             variant="outlined"
             startIcon={<RefreshIcon />}
             className={classes.resetButton}
-            disabled={id == null ? "disabled" : ""}
             onClick={() => refreshPage()}
           />
           <Filter onFilterQuery={filterQuery} />

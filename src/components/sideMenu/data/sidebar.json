@@ -114,9 +114,9 @@
         ]
     },
     {
-        "title": "Support",
+        "title": "Vehicals",
         "icon": "bi-question-circle-fill",
-        "path": "/support"
+        "path": "/employees"
     },
     {
         "title": "Report Bug",

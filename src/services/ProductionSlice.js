@@ -2,9 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const getProductions = createAsyncThunk(
   "getProductions",
-  async ({ arg }) => {
+  async ({ arg }, { rejectWithValue, fulfillWithValue }) => {
     const { token, params } = arg;
-    console.log(arg, "@@@@@@@@@@");
     var url = `${process.env.REACT_APP_BACKEND_URL}/productions`;
     const options = {
       method: "GET",
@@ -13,15 +12,25 @@ export const getProductions = createAsyncThunk(
         token: token,
       },
     };
-    return fetch(url + "?" + new URLSearchParams(params), options).then((res) =>
-      res.json()
-    );
+    try {
+      const response = await fetch(
+        url + "?" + new URLSearchParams(params),
+        options
+      );
+      if (response.ok === false) {
+        return rejectWithValue(response.statusText);
+      }
+      const data = await response.json();
+      return fulfillWithValue(data);
+    } catch (error) {
+      throw rejectWithValue(error.message);
+    }
   }
 );
 
 export const deleteProduction = createAsyncThunk(
   "deleteProduction",
-  async ({ arg }) => {
+  async ({ arg }, { rejectWithValue, fulfillWithValue }) => {
     const { token, id } = arg;
     var url = `${process.env.REACT_APP_BACKEND_URL}/production/?id=${id}`;
     const options = {
@@ -32,12 +41,21 @@ export const deleteProduction = createAsyncThunk(
         token: token,
       },
     };
-    return fetch(url, options).then((res) => res.json());
+    try {
+      const response = await fetch(url, options);
+      if (response.ok === false) {
+        return rejectWithValue(response.statusText);
+      }
+      const data = await response.json();
+      return fulfillWithValue(data);
+    } catch (error) {
+      throw rejectWithValue(error.message);
+    }
   }
 );
 export const createProduction = createAsyncThunk(
   "createProduction",
-  async ({ arg }) => {
+  async ({ arg }, { rejectWithValue, fulfillWithValue }) => {
     const { body, token } = arg;
     var url;
     if (body.hasOwnProperty("_id")) {
@@ -54,23 +72,22 @@ export const createProduction = createAsyncThunk(
       },
       body: JSON.stringify(body),
     };
-    return fetch(url, options).then((res) => res.json());
+    try {
+      const response = await fetch(url, options);
+      if (response.ok === false) {
+        return rejectWithValue(response.statusText);
+      }
+      const data = await response.json();
+      return fulfillWithValue(data);
+    } catch (error) {
+      throw rejectWithValue(error.message);
+    }
   }
 );
-export const updatePost = createAsyncThunk(
-  "data/updatePost",
-  async ({ id, title, body }) => {
-    return fetch(`https://jsonplaceholder.typicode.com/datas/${id}`, {
-      method: "PUT",
-      headers: {
-        Accept: "application/json",
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        body,
-      }),
-    }).then((res) => res.json());
+export const clearErrorState = createAsyncThunk(
+  "clearErrorState",
+  async ({ arg }, { rejectWithValue, fulfillWithValue }) => {
+    return fulfillWithValue();
   }
 );
 
@@ -78,10 +95,14 @@ const ProductionSlice = createSlice({
   name: "data",
   initialState: {
     data: [],
-    createdData: [],
-    deletedData: [],
+    createdData: undefined,
+    deletedData: undefined,
+    updateData: undefined,
     loading: false,
     error: null,
+    createError: undefined,
+    deleteError: undefined,
+    updateError: undefined,
     body: "",
     edit: false,
   },
@@ -92,6 +113,11 @@ const ProductionSlice = createSlice({
     },
   },
   extraReducers: {
+    [clearErrorState.fulfilled]: (state, action) => {
+      state.createError = undefined;
+      state.deleteError = undefined;
+      state.updateError = undefined;
+    },
     [getProductions.pending]: (state, action) => {
       state.loading = true;
     },
@@ -112,29 +138,19 @@ const ProductionSlice = createSlice({
     },
     [deleteProduction.rejected]: (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.deleteError = action.payload;
     },
     [createProduction.pending]: (state, action) => {
       state.loading = true;
     },
     [createProduction.fulfilled]: (state, action) => {
-      state.loading = false;
       state.createdData = [action.payload];
+      state.loading = false;
     },
     [createProduction.rejected]: (state, action) => {
+      console.log(action, "rejected");
       state.loading = false;
-      state.error = action.payload;
-    },
-    [updatePost.pending]: (state, action) => {
-      state.loading = true;
-    },
-    [updatePost.fulfilled]: (state, action) => {
-      state.loading = false;
-      state.data = [action.payload];
-    },
-    [updatePost.rejected]: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
+      state.createError = action.payload;
     },
   },
 });
