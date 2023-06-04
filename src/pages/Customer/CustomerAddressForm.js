@@ -5,22 +5,18 @@ import { useForm, Form } from "../../components/useForm";
 import moment from "moment";
 
 const initialFValues = {
-  date: new Date(),
-  quantity: "",
-  type: "FourInch",
+  price: "",
+  address: "",
 };
 
-export default function ProductionForm(props) {
-  const { addOrEdit, recordForEdit } = props;
-
+export default function CustomerAddressForm(props) {
+  const { addOrEditAdress, recordForEdit, addressEvent } = props;
   const validate = (fieldValues = values) => {
     let temp = { ...errors };
-    if ("date" in fieldValues)
-      temp.date = fieldValues.date ? "" : "This field is required.";
-    if ("brickType" in fieldValues)
-      temp.brickType = fieldValues.brickType ? "" : "This field is required.";
-    if ("quantity" in fieldValues)
-      temp.quantity = fieldValues.quantity ? "" : "Quantity field is required.";
+    if ("price" in fieldValues)
+      temp.price = fieldValues.price ? "" : "Price field is required.";
+    if ("address" in fieldValues)
+      temp.address = fieldValues.address ? "" : "Address field is required.";
 
     setErrors({
       ...temp,
@@ -35,14 +31,14 @@ export default function ProductionForm(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      values.quantity = parseInt(values.quantity);
-      values.date = moment(values.date).format("YYYY/MM/DD");
-      addOrEdit(values, resetForm);
+      values.price = parseInt(values.price);
+      addOrEditAdress(values, resetForm);
     }
   };
-  const getProductionBrickTypeCollection = () => [
+  const getCustomerBrickTypeCollection = () => [
     { id: "FourInch", title: "FourInch" },
     { id: "SixInch", title: "SixInch" },
+    { id: "both", title: "Both" },
   ];
 
   useEffect(() => {
@@ -56,29 +52,23 @@ export default function ProductionForm(props) {
     <Form onSubmit={handleSubmit}>
       <Grid container>
         <Grid item xs={6}>
-          <Controls.DatePicker
-            name="date"
-            label="Date"
-            value={values.date}
-            onChange={handleInputChange}
-          />
           <Controls.Input
-            label="Quantity"
-            name="quantity"
-            type="number"
-            value={values.quantity}
+            name="address"
+            label="Address"
+            disabled={addressEvent === "update" ? true : false}
+            value={values.address}
             onChange={handleInputChange}
-            error={errors.quantity}
+            error={errors.address}
           />
         </Grid>
         <Grid item xs={6}>
-          <Controls.Select
-            name="type"
-            label="Brick Type"
-            value={values.type}
+          <Controls.Input
+            label="Price"
+            name="price"
+            type="string"
+            value={values.price}
             onChange={handleInputChange}
-            options={getProductionBrickTypeCollection()}
-            error={errors.type}
+            error={errors.price}
           />
           <div>
             <Controls.Button type="submit" text="Submit" />

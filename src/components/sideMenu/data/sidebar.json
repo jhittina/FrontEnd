@@ -116,11 +116,11 @@
     {
         "title": "Vehicals",
         "icon": "bi-question-circle-fill",
-        "path": "/employees"
+        "path": "/vehicle"
     },
     {
-        "title": "Report Bug",
+        "title": "Customer",
         "icon": "bi-bug",
-        "path": "/report-bug"
+        "path": "/customer"
     }
 ]

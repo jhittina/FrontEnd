@@ -5,7 +5,7 @@ import {
   createMuiTheme,
   ThemeProvider,
 } from "@material-ui/core";
-import Vehicle from "./Vehicle";
+import Customer from "./Customer";
 import Layout from "../../components/Layout";
 
 const theme = createMuiTheme({
@@ -43,14 +43,14 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Vehicles() {
+export default function Customers() {
   const classes = useStyles();
 
   return (
     <Layout>
       <ThemeProvider theme={theme}>
         <div className={classes.appMain}>
-          <Vehicle />
+          <Customer />
         </div>
         <CssBaseline />
       </ThemeProvider>

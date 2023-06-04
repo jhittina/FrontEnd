@@ -38,29 +38,9 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }));
 
-const columns = [
-  {
-    field: "date",
-    headerName: "Date",
-    width: 489,
-    editable: false,
-  },
-  {
-    field: "quantity",
-    headerName: "Quantity",
-    width: 489,
-    editable: false,
-  },
-  {
-    field: "type",
-    headerName: "Type",
-    width: 489,
-    editable: false,
-  },
-];
-
 export default function StripedGrid(props) {
-  const { row, loading, onHandleClick } = props;
+  const { row, loading, onHandleClick, columns } = props;
+  console.log(row, "@@@@@@@@@@@@@@@");
   return (
     <div style={{ height: 400, width: "100%" }}>
       <StripedDataGrid

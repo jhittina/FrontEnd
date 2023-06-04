@@ -136,6 +136,26 @@ export default function Production() {
     });
     dispatch(clearErrorState({ arg }));
   }
+  const columns = [
+    {
+      field: "date",
+      headerName: "Date",
+      width: 489,
+      editable: false,
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      width: 489,
+      editable: false,
+    },
+    {
+      field: "type",
+      headerName: "Type",
+      width: 489,
+      editable: false,
+    },
+  ];
 
   const addOrEdit = async (employee, resetForm) => {
     var arg = {};
@@ -264,6 +284,7 @@ export default function Production() {
             <StripedGrid
               row={data[0]}
               loading={loading}
+              columns={columns}
               onHandleClick={handleClick}
             />
             <TablePagination
