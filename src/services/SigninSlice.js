@@ -87,7 +87,6 @@
 // // Export hooks for usage in functional components, which are auto-generated based on the defined endpoints
 // export const { useSignPostMutation } = signinApi
 
-
 // // import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 // // const env = require('dotenv');
 // // env.config();
@@ -241,16 +240,15 @@
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-export const getPost = createAsyncThunk("data/getPost", async ({token}) => {
- return fetch(`${process.env.REACT_APP_BACKEND_URL}/productions`, {
-            method: "GET",
-            headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                    'token': token
-                }
-        }).then((res) => console.log(res));
-    }
-);
+export const getPost = createAsyncThunk("data/getPost", async ({ token }) => {
+  return fetch(`${process.env.REACT_APP_BACKEND_URL}/productions`, {
+    method: "GET",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      token: token,
+    },
+  }).then((res) => console.log(res));
+});
 export const deletePost = createAsyncThunk(
   "data/deletePost",
   async ({ id }) => {
@@ -259,19 +257,16 @@ export const deletePost = createAsyncThunk(
     }).then((res) => res.json());
   }
 );
-export const Signin = createAsyncThunk(
-  "Signin",
-  async ({ body }) => {
-    return fetch(`${process.env.REACT_APP_BACKEND_URL}/admin/signin`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-type": "application/json",
-      },
-      body:JSON.stringify(body)
-    }).then((res) =>  res.json());
-  }
-);
+export const Signin = createAsyncThunk("Signin", async ({ body }) => {
+  return fetch(`http://localhost:2000/admin/signin`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+  }).then((res) => res.json());
+});
 export const updatePost = createAsyncThunk(
   "data/updatePost",
   async ({ id, title, body }) => {
@@ -292,7 +287,7 @@ export const updatePost = createAsyncThunk(
 const SigninSlice = createSlice({
   name: "data",
   initialState: {
-    data:"",
+    data: "",
     loading: false,
     error: null,
     body: "",
@@ -304,18 +299,18 @@ const SigninSlice = createSlice({
       state.body = action.payload.body;
     },
   },
-    extraReducers: {
-      [getPost.pending]: (state, action) => {
-        state.loading = true;
-      },
-      [getPost.fulfilled]: (state, action) => {
-        state.loading = false;
-        state.data = [action.payload];
-      },
-      [getPost.rejected]: (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      },
+  extraReducers: {
+    [getPost.pending]: (state, action) => {
+      state.loading = true;
+    },
+    [getPost.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.data = [action.payload];
+    },
+    [getPost.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
     [deletePost.pending]: (state, action) => {
       state.loading = true;
     },
